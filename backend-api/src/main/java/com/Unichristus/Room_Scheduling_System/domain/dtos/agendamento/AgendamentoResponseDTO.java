@@ -1,5 +1,7 @@
 package com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento;
 
+import com.Unichristus.Room_Scheduling_System.domain.enums.Horario;
+import com.Unichristus.Room_Scheduling_System.domain.enums.Turno;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -11,8 +13,8 @@ public class AgendamentoResponseDTO {
     private UUID id;
     private UUID salaId;
     private LocalDate data;
-    private Integer turno;
-    private Integer horario;
+    private Turno turno;
+    private Horario horario;
     private String descricao;
 
 }
