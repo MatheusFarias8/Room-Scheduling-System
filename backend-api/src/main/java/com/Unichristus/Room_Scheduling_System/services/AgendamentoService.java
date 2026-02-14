@@ -4,6 +4,9 @@ import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.Agendament
 import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.AgendamentoResponseDTO;
 import com.Unichristus.Room_Scheduling_System.domain.models.Agendamento;
 import com.Unichristus.Room_Scheduling_System.domain.models.Sala;
+import com.Unichristus.Room_Scheduling_System.exceptions.AgendamentoNotFoundException;
+import com.Unichristus.Room_Scheduling_System.exceptions.ConflitoAgendamentoException;
+import com.Unichristus.Room_Scheduling_System.exceptions.SalaNotFoundException;
 import com.Unichristus.Room_Scheduling_System.mappers.AgendamentoMapper;
 import com.Unichristus.Room_Scheduling_System.repositories.AgendamentoRepository;
 import com.Unichristus.Room_Scheduling_System.repositories.SalaRepository;
@@ -30,7 +33,7 @@ public class AgendamentoService {
 
     public AgendamentoResponseDTO buscarPorId(UUID id) {
         Agendamento agendamento = agendamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+                .orElseThrow(() -> new AgendamentoNotFoundException(id));
 
         return mapper.toResponseDTO(agendamento);
     }
@@ -40,7 +43,7 @@ public class AgendamentoService {
         validarConflito(dto, null);
 
         Sala sala = salaRepository.findById(dto.getSalaId())
-                .orElseThrow(() -> new RuntimeException("Sala não encontrada"));
+                .orElseThrow(() -> new SalaNotFoundException(dto.getSalaId()));
 
         Agendamento agendamento = mapper.toEntity(dto);
         agendamento.setSala(sala);
@@ -53,7 +56,7 @@ public class AgendamentoService {
     public AgendamentoResponseDTO atualizar(UUID id, AgendamentoRequestDTO dto) {
 
         Agendamento existente = agendamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+                .orElseThrow(() -> new AgendamentoNotFoundException(id));
 
         validarConflito(dto, id);
 
@@ -70,7 +73,7 @@ public class AgendamentoService {
     public void deletar(UUID id) {
 
         if (!agendamentoRepository.existsById(id)) {
-            throw new RuntimeException("Agendamento não encontrado");
+            throw new AgendamentoNotFoundException(id);
         }
 
         agendamentoRepository.deleteById(id);
@@ -98,7 +101,7 @@ public class AgendamentoService {
         }
 
         if (existe) {
-            throw new RuntimeException("Já existe agendamento para essa sala nesse horário");
+            throw new ConflitoAgendamentoException();
         }
     }
 }
