@@ -3,6 +3,7 @@ package com.Unichristus.Room_Scheduling_System.controllers;
 import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.AgendamentoRequestDTO;
 import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.AgendamentoResponseDTO;
 import com.Unichristus.Room_Scheduling_System.services.AgendamentoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AgendamentoController {
 
     @PostMapping
     public ResponseEntity<AgendamentoResponseDTO> criar(
-            @RequestBody AgendamentoRequestDTO dto
+            @Valid @RequestBody AgendamentoRequestDTO dto
     ) {
         AgendamentoResponseDTO criado = service.criar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
@@ -39,7 +40,7 @@ public class AgendamentoController {
     @PutMapping("/{id}")
     public ResponseEntity<AgendamentoResponseDTO> atualizar(
             @PathVariable UUID id,
-            @RequestBody AgendamentoRequestDTO dto
+            @Valid @RequestBody AgendamentoRequestDTO dto
     ) {
         return ResponseEntity.ok(service.atualizar(id, dto));
     }
