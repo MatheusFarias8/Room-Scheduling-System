@@ -64,12 +64,20 @@ public class AgendamentoService {
         Agendamento existente = agendamentoRepository.findById(id)
                 .orElseThrow(() -> new AgendamentoNotFoundException(id));
 
+        Sala sala = salaRepository.findById(dto.getSalaId())
+                .orElseThrow(() -> new SalaNotFoundException(dto.getSalaId()));
+
+        if (sala.getStatus() != StatusSala.ATIVA) {
+            throw new SalaIndisponivelException(sala.getStatus());
+        }
+
         validarConflito(dto, id);
 
         existente.setData(dto.getData());
         existente.setTurno(dto.getTurno());
         existente.setHorario(dto.getHorario());
         existente.setDescricao(dto.getDescricao());
+        existente.setSala(sala);
 
         Agendamento atualizado = agendamentoRepository.save(existente);
 

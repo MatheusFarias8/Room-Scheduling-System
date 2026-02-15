@@ -41,7 +41,7 @@ public class SalaMockLoader {
                         .descricao("Sala 201")
                         .andar("2º Andar")
                         .capacidade(40)
-                        .status(StatusSala.ATIVA)
+                        .status(StatusSala.INATIVA)
                         .build(),
 
                 Sala.builder()
