@@ -2,10 +2,12 @@ package com.Unichristus.Room_Scheduling_System.services;
 
 import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.AgendamentoRequestDTO;
 import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.AgendamentoResponseDTO;
+import com.Unichristus.Room_Scheduling_System.domain.enums.StatusSala;
 import com.Unichristus.Room_Scheduling_System.domain.models.Agendamento;
 import com.Unichristus.Room_Scheduling_System.domain.models.Sala;
 import com.Unichristus.Room_Scheduling_System.exceptions.AgendamentoNotFoundException;
 import com.Unichristus.Room_Scheduling_System.exceptions.ConflitoAgendamentoException;
+import com.Unichristus.Room_Scheduling_System.exceptions.SalaIndisponivelException;
 import com.Unichristus.Room_Scheduling_System.exceptions.SalaNotFoundException;
 import com.Unichristus.Room_Scheduling_System.mappers.AgendamentoMapper;
 import com.Unichristus.Room_Scheduling_System.repositories.AgendamentoRepository;
@@ -44,6 +46,10 @@ public class AgendamentoService {
 
         Sala sala = salaRepository.findById(dto.getSalaId())
                 .orElseThrow(() -> new SalaNotFoundException(dto.getSalaId()));
+
+        if (sala.getStatus() != StatusSala.ATIVA) {
+            throw new SalaIndisponivelException(sala.getStatus());
+        }
 
         Agendamento agendamento = mapper.toEntity(dto);
         agendamento.setSala(sala);
