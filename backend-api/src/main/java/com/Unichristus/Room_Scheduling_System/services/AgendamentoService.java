@@ -5,16 +5,15 @@ import com.Unichristus.Room_Scheduling_System.domain.dtos.agendamento.Agendament
 import com.Unichristus.Room_Scheduling_System.domain.enums.StatusSala;
 import com.Unichristus.Room_Scheduling_System.domain.models.Agendamento;
 import com.Unichristus.Room_Scheduling_System.domain.models.Sala;
-import com.Unichristus.Room_Scheduling_System.exceptions.AgendamentoNotFoundException;
-import com.Unichristus.Room_Scheduling_System.exceptions.ConflitoAgendamentoException;
-import com.Unichristus.Room_Scheduling_System.exceptions.SalaIndisponivelException;
-import com.Unichristus.Room_Scheduling_System.exceptions.SalaNotFoundException;
+import com.Unichristus.Room_Scheduling_System.exceptions.*;
 import com.Unichristus.Room_Scheduling_System.mappers.AgendamentoMapper;
 import com.Unichristus.Room_Scheduling_System.repositories.AgendamentoRepository;
 import com.Unichristus.Room_Scheduling_System.repositories.SalaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +24,9 @@ public class AgendamentoService {
     private final AgendamentoRepository agendamentoRepository;
     private final AgendamentoMapper mapper;
     private final SalaRepository salaRepository;
+
+    @Value("${agendamento.limite.meses:12}")
+    private int limiteMeses;
 
     public List<AgendamentoResponseDTO> listarTodos() {
         return agendamentoRepository.findAll()
@@ -42,6 +44,7 @@ public class AgendamentoService {
 
     public AgendamentoResponseDTO criar(AgendamentoRequestDTO dto) {
 
+        validarData(dto.getData());
         validarConflito(dto, null);
 
         Sala sala = salaRepository.findById(dto.getSalaId())
@@ -60,6 +63,8 @@ public class AgendamentoService {
     }
 
     public AgendamentoResponseDTO atualizar(UUID id, AgendamentoRequestDTO dto) {
+
+        validarData(dto.getData());
 
         Agendamento existente = agendamentoRepository.findById(id)
                 .orElseThrow(() -> new AgendamentoNotFoundException(id));
@@ -91,6 +96,23 @@ public class AgendamentoService {
         }
 
         agendamentoRepository.deleteById(id);
+    }
+
+    private void validarData(LocalDate data) {
+
+        if (data == null) {
+            throw new DataAgendamentoInvalidaException("Data é obrigatória");
+        }
+
+        if (data.isBefore(LocalDate.now())) {
+            throw new DataAgendamentoInvalidaException("Não é possível agendar para data passada");
+        }
+
+        if (data.isAfter(LocalDate.now().plusMonths(limiteMeses))) {
+            throw new DataAgendamentoInvalidaException(
+                    "Não é permitido agendar com mais de " + limiteMeses + " meses de antecedência"
+            );
+        }
     }
 
     private void validarConflito(AgendamentoRequestDTO dto, UUID id) {

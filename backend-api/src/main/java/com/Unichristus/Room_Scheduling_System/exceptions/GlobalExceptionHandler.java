@@ -63,8 +63,25 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SalaIndisponivelException.class)
-    public ResponseEntity<ErrorResponse> handleConflito(
+    public ResponseEntity<ErrorResponse> handleSalaIndisponivel(
             SalaIndisponivelException ex,
+            HttpServletRequest request
+    ) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(DataAgendamentoInvalidaException.class)
+    public ResponseEntity<ErrorResponse> handleDataAgendamentoInvalida(
+            DataAgendamentoInvalidaException ex,
             HttpServletRequest request
     ) {
 
