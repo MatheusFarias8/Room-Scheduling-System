@@ -103,9 +103,11 @@ Exceções tratadas incluem:
 
 - DataAgendamentoInvalidaException
 
-- EntidadeNaoEncontradaException
+- ConflitoAgendamentoException
 
-- MethodArgumentNotValidException
+- SalaNotFoundException
+
+- AgendamentoNotFoundException
 
 
 ---
